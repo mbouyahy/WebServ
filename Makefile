@@ -16,6 +16,7 @@ FILES =	main.cpp \
 		ServersSocket.cpp \
 		Location.cpp \
 		run.cpp \
+		Request.cpp \
 
 INCLUDE_DIR = include
 

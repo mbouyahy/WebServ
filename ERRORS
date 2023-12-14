@@ -1,0 +1,3 @@
+^Cwebserv(4907,0x10871adc0) malloc: *** error for object 0x7f9071c059c0: pointer being freed was not allocated
+webserv(4907,0x10871adc0) malloc: *** set a breakpoint in malloc_error_break to debug
+[1]    4907 abort      ./webserv c.conf

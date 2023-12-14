@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include "Request.hpp"
 
 void Config::_readRequest(int sd)
 {
@@ -70,10 +71,23 @@ void Config::run()
 					_addPollfd(client_fd, POLLIN | POLLOUT);
 				}
 				else // read request from client
+				{
 					_readRequest(sd);
+					
+					std::cout << "\n<------------------------------>\n" << std::endl;//added by mbouyahy
+					HttpRequests::SingleRequest.push_back(_readStr);
+					HttpRequests::RequestData.push_back(HttpRequests::SingleRequest);
+					FillLines(HttpRequests::RequestData);
+					// PrintData(HttpRequests::RequestData);
+					_readStr = "";
+					HttpRequests::SingleRequest.clear();
+				}
 			}
 			else if (_pollFds[i].revents & POLLOUT) // send response to the client
+			{
+				//remove the handled request from RequestData
 				_sendResponse(sd);
+			}
 		}
 	}
 }
