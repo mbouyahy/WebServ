@@ -6,7 +6,7 @@
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:17:44 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/14 11:57:01 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/16 10:54:45 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,13 @@
 #define INCORRECT -1
 
 //The CRLF is the standard line ending sequence in HTTP.
-//Carriage Return && Line Feed
-#define CRLF "\r\n"
+#define CRLF "\r\n" //Carriage Return && Line Feed
 
-// Line Feed
-#define LF "\n"
 
-// Carriage Return
-#define CR "\r"
+#define LF "\n" // Line Feed
+
+
+#define CR "\r" // Carriage Return
 
 //URI_CHARACTERS macros for checking if URI is Correct or not  
 #define URI_CHARACTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%"
@@ -48,9 +47,22 @@ class HttpRequests
         
         static std::vector<std::vector<std::string> >   RequestData;
         static std::vector<std::string>                 SingleRequest;
-        static std::string                              Method;
+        static int                                      Method;
+        static int                                      ErrorCode;
 
         static std::string RequestLine;//Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+        /*
+            Transfer-Encoding: chunked
+            Transfer-Encoding: compress
+            Transfer-Encoding: deflate
+            Transfer-Encoding: gzip
+
+            // Several values can be listed, separated by a comma
+            Transfer-Encoding: gzip, chunked
+        */
+        static std::string TransferEncoding;
+        static std::string Referer;//favicon.ico!!
+        static std::string RequestURI;//( / , /nameofpage, )
 
         // static void    StoreRequest(std::string    _readStr);
 };
