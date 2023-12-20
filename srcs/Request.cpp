@@ -6,7 +6,7 @@
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:45:11 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 17:34:13 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/20 19:01:54 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 // int                                     HttpRequests::ErrorCode;
 // std::string                             HttpRequests::RequestURI;
 // std::list<HttpRequests::header>         HttpRequests::headers;
-
+void    PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >           Body);
 HttpRequests::HttpRequests()
 { 
 }
@@ -133,8 +133,12 @@ void HttpRequests::SplitLine(std::string Line)
     }
     for (size_t i = 0; i < begin; i++)
         Key += Line[i];
-    for (size_t i = begin + 1; i < Line.size(); i++)
+    for (size_t i = begin + 2; i < Line.size(); i++)//skep (:Space)
+    {
+        if (Line[i] == '\n' || Line[i] == '\r')
+            break ;
         Value += Line[i];
+    }
     if (SearchLine(Line, "Content-Type"))
         ContentType = Value;
     if (SearchLine(Line, "Content-Length"))
@@ -200,12 +204,37 @@ std::string  HttpRequests::FillRequestLine()//change this and work with SearchLi
     return (RequestLine);
 }
 
+void OrganizeContentType(HttpRequests *Request)
+{
+    (void)Request;
+    std::string Line;
+    std::string Key;
+    std::string Value;
+    bool Status;
+    std::istringstream ss(Request->AllBody);
+    std::vector<std::pair<std::string, std::string> >           Body;
+
+    while (getline(ss, Line, '&'))
+    {
+        std::istringstream s(Line);
+        Status = false;
+        Value = "";
+        Key = "";
+        while (getline(s, Line, '='))
+        {
+            Status ? Value = Line : Key = Line;
+            Status = true;
+        }
+        Body.push_back(std::make_pair(Key, Value));
+    }
+    Request->SetBody(Body);
+    PrintVectorOfPairs(Request->GetBody());
+}
+
 void    ConvertBodyToKeyValue(HttpRequests *Request)
 {
-    if (!Request->GetContentType().empty() && Request->GetContentType() == "")
-    {
-        
-    }
+    if (Request->GetContentType() == "application/x-www-form-urlencoded")
+        OrganizeContentType(Request);
 }
 
 void FillBody(HttpRequests *Request, std::string data)
@@ -228,8 +257,8 @@ void FillBody(HttpRequests *Request, std::string data)
         // std::cout << data[i];
         Request->AllBody += data[i];
     }
+    std::cout << Request->AllBody << std::endl;
     ConvertBodyToKeyValue(Request);
-    // std::cout << Request->AllBody;
     std::cout << "\n<---------------Body Begin----------------->" << std::endl;
 }
 
@@ -253,6 +282,17 @@ HttpRequests *    FillLines(std::vector<std::string>    SingleRequest)
         // std::cout << "Return Value : " << SearchLine(HttpRequests::RequestLine, "GET") << std::endl;
     }
     return (Request);
+}
+
+void    PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >           Body)
+{
+    // std::vector<std::pair<std::string, std::string> >           Body;
+    std::vector<std::pair<std::string, std::string> >::iterator           iter;
+    // Body = Request->GetBody();
+    for (iter = Body.begin(); iter != Body.end(); iter++)
+    {
+        std::cout << "Key : " << iter->first << " | Value : " << iter->second << std::endl;
+    }
 }
 
 void PrintData(std::vector<std::vector<std::string> >  RequestData)
