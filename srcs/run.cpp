@@ -38,14 +38,50 @@ void Config::_sendResponse(int sd)
 	}
 }
 
+//BEGIN
+/*
+ADDED BY MBOUYAHTY
+*/
+
+void PrintMap(std::__1::map<int, Client *> _Map)
+{
+	std::__1::map<int, Client *>::iterator iter;
+	for (iter = _Map.begin(); iter != _Map.end(); iter++)
+	{
+		std::cout << "<-------------------Info------------------>" << std::endl;
+
+		std::cout << "Sd : " << iter->first << std::endl;
+		std::cout << "RequestLine : " << iter->second->ClientRequest->GetRequestLine() << std::endl;
+		std::cout << "RequestURI : " << iter->second->ClientRequest->GetRequestURI() << std::endl;
+		std::cout << "Method : " << iter->second->ClientRequest->GetMethod() << std::endl;
+		std::cout << "HTTPVersion : " << iter->second->ClientRequest->GetHTTPVersion() << std::endl;
+		std::cout << "ErrorCode : " << iter->second->ClientRequest->GetErrorCode() << std::endl;
+
+		std::cout << "<-------------------Header------------------>" << std::endl;
+
+		std::map<std::string, std::string>                          _Header;
+		_Header = iter->second->ClientRequest->GetHeader();
+		for (std::map<std::string, std::string>::iterator Hiter = _Header.begin(); Hiter != _Header.end(); Hiter++)
+		{
+			std::cout << "Key :   " << Hiter->first << "                                          Value : " << Hiter->second << std::endl;
+		}
+
+		std::cout << "<-------------------Body------------------>" << std::endl;
+		// std::cout << "GetRequestData : " << iter->second->ClientRequest.GetRequestData();
+	}
+}
+//END
+
 void Config::run()
 {
 	Printers::print_serversSockets(_portToServersSocket);
 
 	ServersSocket* sS;
+	std::map<int, Client *>					ClientsInformation;
 
 	while (!g_sigint)
 	{
+		Client *_Client = new Client();
 		if ((poll(_pollFds.data(), _pollFds.size(), -1)) <= 0)
 			continue;
 		for (size_t i = 0; i < _pollFds.size(); i++)
@@ -73,14 +109,23 @@ void Config::run()
 				else // read request from client
 				{
 					_readRequest(sd);
-					
+
 					std::cout << "\n<------------------------------>\n" << std::endl;//added by mbouyahy
-					HttpRequests::SingleRequest.push_back(_readStr);
-					HttpRequests::RequestData.push_back(HttpRequests::SingleRequest);
-					FillLines(HttpRequests::RequestData);
+					HttpRequests *Request = new HttpRequests();
+					std::vector<std::string>                                    SingleRequest;
+
+					SingleRequest.push_back(_readStr);
+					// Request->RequestData.push_back(HttpRequests::SingleRequest);
+					Request = FillLines(SingleRequest);
 					// PrintData(HttpRequests::RequestData);
 					_readStr = "";
-					HttpRequests::SingleRequest.clear();
+					// Request->SingleRequest.clear();
+					// _Client->ClientRequest = ;
+
+					//Sd | Client Request
+					_Client->ClientRequest = Request;
+					ClientsInformation.insert(std::make_pair(sd, _Client));
+					// PrintMap(ClientsInformation);
 				}
 			}
 			else if (_pollFds[i].revents & POLLOUT) // send response to the client

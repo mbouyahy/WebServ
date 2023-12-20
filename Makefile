@@ -17,6 +17,7 @@ FILES =	main.cpp \
 		Location.cpp \
 		run.cpp \
 		Request.cpp \
+		Client.cpp \
 
 INCLUDE_DIR = include
 
