@@ -6,7 +6,7 @@
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:17:44 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 19:40:14 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/20 22:17:37 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ class HttpRequests
         
         std::vector<std::string>                                    Lines;
         std::string                                                 AllBody;
+        std::string                                                 boundary;
 
         //Member Functions
         std::vector<std::string>                                    SplitRequest(std::string data);
@@ -91,6 +92,7 @@ class HttpRequests
         void                                                        SplitLine(std::string Line);
         void                                                        FillRequestURI();
         bool                                                        iSValidURI();
+        void                                                        SpecialGetContentType(std::string   Value);
 
         //Functions For Testing Only
         void                                                        PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >    Body);

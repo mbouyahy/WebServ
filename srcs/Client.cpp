@@ -6,7 +6,7 @@
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 12:39:10 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 19:51:23 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/20 20:40:11 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ void PrintMap(std::__1::map<int, Client *> *_Map)
 		std::cout << "\n<-------------------Header End------------------>" << std::endl;
 
 		std::cout << "\n<-------------------Body Begin------------------>\n" << std::endl;
-		iter->second->ClientRequest->PrintVectorOfPairs(iter->second->ClientRequest->GetBody());
+        if (iter->second->ClientRequest->GetMethod() == "POST")
+		    iter->second->ClientRequest->PrintVectorOfPairs(iter->second->ClientRequest->GetBody());
 		std::cout << "\n<-------------------Body End------------------>\n" << std::endl;
 	}
 }

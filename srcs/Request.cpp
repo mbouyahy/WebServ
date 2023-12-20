@@ -6,7 +6,7 @@
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:45:11 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 20:05:36 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/20 22:26:27 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,16 @@ bool    HttpRequests::iSValidURI()
    return (true);
 }
 
+void HttpRequests::SpecialGetContentType(std::string     Value)
+{
+    size_t begin = Value.find(";");
+    for (size_t i = 0; i < begin && begin <= Value.size(); i++)
+        ContentType += Value[i];
+    begin = Value.find("="); 
+    for (size_t i = begin + 1; i < Value.size() && begin <= Value.size(); i++)//skep (;Space)
+        boundary += Value[i];
+}
+
 void HttpRequests::SplitLine(std::string Line)
 {
     size_t          begin;
@@ -117,7 +127,12 @@ void HttpRequests::SplitLine(std::string Line)
         Value += Line[i];
     }
     if (SearchLine(Line, "Content-Type"))
-        ContentType = Value;
+    {
+        if (Value.find("multipart/form-data") <= Value.size())
+            SpecialGetContentType(Value);
+        else
+            ContentType = Value;
+    }
     if (SearchLine(Line, "Content-Length"))
         ContentLength = static_cast<int>(strtod(Value.c_str(), NULL));
     if (SearchLine(Line, "Connection"))
@@ -159,6 +174,7 @@ std::vector<std::string> HttpRequests::SplitRequest(std::string data)
         if (i > 0)
             SplitLine(Line);
         Lines.push_back(Line);
+        // std::cout << Line << std::endl;
         i++;
     }
     return (Lines);
@@ -172,7 +188,7 @@ std::string  HttpRequests::FillRequestLine()//change this and work with SearchLi
     return (RequestLine);
 }
 
-void OrganizeContentType(HttpRequests *Request)
+void FormOne(HttpRequests *Request)
 {
     bool                                                Status;
     std::string                                         Line;
@@ -197,10 +213,19 @@ void OrganizeContentType(HttpRequests *Request)
     Request->SetBody(Body);
 }
 
+void FormTwo(HttpRequests *Request)
+{
+    (void)Request;
+    std::cout << "*****" << std::endl;
+}
+
 void    ConvertBodyToKeyValue(HttpRequests *Request)
 {
+    // std::cout << Request->GetContentType() << std::endl;
     if (Request->GetContentType() == "application/x-www-form-urlencoded")
-        OrganizeContentType(Request);
+        FormOne(Request);
+    else if (Request->GetContentType() == "multipart/form-data")
+        FormTwo(Request);
 }
 
 void FillBody(HttpRequests *Request, std::string data)
@@ -217,6 +242,7 @@ void FillBody(HttpRequests *Request, std::string data)
         Request->AllBody += data[i];
     }
     ConvertBodyToKeyValue(Request);
+    Request->PrintVectorOfPairs(Request->GetBody());
 }
 
 HttpRequests *    FillLines(std::vector<std::string>    SingleRequest)
@@ -235,17 +261,6 @@ HttpRequests *    FillLines(std::vector<std::string>    SingleRequest)
     return (Request);
 }
 
-bool    SearchSd(std::map<int, Client *>	*ClientsInformation, int sd)
-{
-    std::__1::map<int, Client *>::iterator iter;
-	for (iter = ClientsInformation->begin(); iter != ClientsInformation->end(); iter++)
-	{
-        if (iter->first == sd)
-            return (true);
-    }
-    return (false);
-}
-
 void	HandleRequest(std::string _readStr, int sd, std::map<int, Client *>	*ClientsInformation, Client *_Client)
 {
 	HttpRequests				*Request;
@@ -256,7 +271,7 @@ void	HandleRequest(std::string _readStr, int sd, std::map<int, Client *>	*Client
 	Request = FillLines(SingleRequest);
 	_Client->ClientRequest = Request;
 	ClientsInformation->insert(std::make_pair(sd, _Client));
-	PrintMap(ClientsInformation);
+	// PrintMap(ClientsInformation);
 }
 
 void    HttpRequests::PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >           Body)
