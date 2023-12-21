@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Request.hpp                                        :+:      :+:    :+:   */
+/*   Requests.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:17:44 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 22:17:37 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/21 21:42:35 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#ifndef REQUESTS_HPP
+#define REQUESTS_HPP
 
 //change the name of file to HttpRequests or the reverse
 #include <iostream>
@@ -33,7 +33,7 @@ class Client;
 #define LF "\n" // Line Feed
 #define CR "\r" // Carriage Return
 
-class HttpRequests
+class Requests
 {
     private:
         std::vector<std::pair<std::string, std::string> >           Body;
@@ -49,10 +49,10 @@ class HttpRequests
         std::string                                                 ContentType;
         std::string                                                 Connection;
     public:
-        HttpRequests();
-        ~HttpRequests();
-        HttpRequests(const HttpRequests &other);
-        HttpRequests &operator=(const HttpRequests &other);
+        Requests();
+        ~Requests();
+        Requests(const Requests &other);
+        Requests &operator=(const Requests &other);
 
 
         //Getters
@@ -98,7 +98,7 @@ class HttpRequests
         void                                                        PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >    Body);
 };
 
-HttpRequests                                                        *FillLines(std::vector<std::string>    SingleRequest);
+Requests                                                            *FillLines(std::vector<std::string>    SingleRequest);
 void                                                                PrintData(std::vector<std::vector<std::string> >  RequestData);
 void                                                                HandleRequest(std::string _readStr, int sd, std::map<int, Client *>	*ClientsInformation, Client *_Client);
 

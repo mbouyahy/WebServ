@@ -1,69 +1,69 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Request.cpp                                        :+:      :+:    :+:   */
+/*   Requests.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:45:11 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/21 15:03:47 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/21 21:44:17 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Request.hpp"
+#include "Requests.hpp"
 
-HttpRequests::HttpRequests(){ }
+Requests::Requests(){}
 
-HttpRequests::~HttpRequests(){}
+Requests::~Requests(){}
 
-HttpRequests::HttpRequests(const HttpRequests &other){ (void)other; }
+Requests::Requests(const Requests &other){ (void)other; }
 
-HttpRequests &HttpRequests::operator=(const HttpRequests &other)
+Requests &Requests::operator=(const Requests &other)
 {
     if (this != &other){}
     return (*this);
 }
 
-std::vector<std::pair<std::string, std::string> >   HttpRequests::GetBody() const{ return (Body); }
+std::vector<std::pair<std::string, std::string> >   Requests::GetBody() const { return (Body); }
 
-std::map<std::string, std::string>                  HttpRequests::GetHeader() const { return (Header); }
+std::map<std::string, std::string>                  Requests::GetHeader() const { return (Header); }
 
-std::string                                         HttpRequests::GetRequestURI() const { return (RequestURI); }
+std::string                                         Requests::GetRequestURI() const { return (RequestURI); }
 
-std::string                                         HttpRequests::GetRequestLine() const { return (RequestLine); }
+std::string                                         Requests::GetRequestLine() const { return (RequestLine); }
 
-std::string                                         HttpRequests::GetHTTPVersion() const { return (HTTPVersion); }
+std::string                                         Requests::GetHTTPVersion() const { return (HTTPVersion); }
 
-std::string                                         HttpRequests::GetMethod() const { return (Method); }
+std::string                                         Requests::GetMethod() const { return (Method); }
 
-std::string                                         HttpRequests::GetConnection() const { return (Connection); }
+std::string                                         Requests::GetConnection() const { return (Connection); }
 
-std::string                                         HttpRequests::GetContentType() const { return (ContentType); };
+std::string                                         Requests::GetContentType() const { return (ContentType); };
 
-int                                                 HttpRequests::GetErrorCode() const { return (ErrorCode); }
+int                                                 Requests::GetErrorCode() const { return (ErrorCode); }
 
-int                                                 HttpRequests::GetContentLength() const { return (ContentLength); }
+int                                                 Requests::GetContentLength() const { return (ContentLength); }
 
 
-void                                                HttpRequests::SetBody(std::vector<std::pair<std::string, std::string> > value){ Body = value; }
+void                                                Requests::SetBody(std::vector<std::pair<std::string, std::string> > value){ Body = value; }
 
-void                                                HttpRequests::SetRequestURI(std::string value) { RequestURI = value; }
+void                                                Requests::SetRequestURI(std::string value) { RequestURI = value; }
 
-void                                                HttpRequests::SetRequestLine(std::string value) { RequestLine= value; }
+void                                                Requests::SetRequestLine(std::string value) { RequestLine= value; }
 
-void                                                HttpRequests::SetHTTPVersion(std::string value) { HTTPVersion = value; }
+void                                                Requests::SetHTTPVersion(std::string value) { HTTPVersion = value; }
 
-void                                                HttpRequests::SetMethod(std::string value) { Method = value; }
+void                                                Requests::SetMethod(std::string value) { Method = value; }
 
-void                                                HttpRequests::SetErrorCode(int value) { ErrorCode = value; }
+void                                                Requests::SetErrorCode(int value) { ErrorCode = value; }
 
-void                                                HttpRequests::SetHeader(std::map<std::string, std::string> value) { Header = value; }
+void                                                Requests::SetHeader(std::map<std::string, std::string> value) { Header = value; }
 
-void                                                HttpRequests::SetContentType(std::string value) { ContentType = value; }
+void                                                Requests::SetContentType(std::string value) { ContentType = value; }
 
-void                                                HttpRequests::SetContentLength(int value) {ContentLength = value;}
+void                                                Requests::SetContentLength(int value) {ContentLength = value;}
 
-void                                                HttpRequests::SetConnection(std::string value){ Connection = value; }
+void                                                Requests::SetConnection(std::string value){ Connection = value; }
 
 bool SearchLine(std::string Line, std::string Content)
 {
@@ -72,7 +72,7 @@ bool SearchLine(std::string Line, std::string Content)
     return (false);
 }
 
-bool    HttpRequests::iSValidURI()
+bool    Requests::iSValidURI()
 {
    std::string  uri_Characters;
    
@@ -92,7 +92,7 @@ bool    HttpRequests::iSValidURI()
    return (true);
 }
 
-void HttpRequests::SpecialGetContentType(std::string     Value)
+void Requests::SpecialGetContentType(std::string     Value)
 {
     size_t begin = Value.find(";");
     for (size_t i = 0; i < begin && begin <= Value.size(); i++)
@@ -108,7 +108,7 @@ void HttpRequests::SpecialGetContentType(std::string     Value)
     boundary += "\r";
 }
 
-void HttpRequests::SplitLine(std::string Line)
+void Requests::SplitLine(std::string Line)
 {
     size_t          begin;
     std::string     Value;
@@ -119,7 +119,7 @@ void HttpRequests::SplitLine(std::string Line)
     begin = Line.find(":");
     if (begin >= Line.size())
     {
-        HttpRequests::ErrorCode = 1;
+        Requests::ErrorCode = 1;
         return ;
     }
     for (size_t i = 0; i < begin; i++)
@@ -144,7 +144,7 @@ void HttpRequests::SplitLine(std::string Line)
     Header.insert(std::make_pair(Key, Value));
 }
 
-void HttpRequests::FillRequestURI()
+void Requests::FillRequestURI()
 {
     size_t          begin;
     size_t          end;
@@ -165,7 +165,7 @@ void HttpRequests::FillRequestURI()
         return ;//return error code
 }
 
-std::vector<std::string> HttpRequests::SplitRequest(std::string data)
+std::vector<std::string> Requests::SplitRequest(std::string data)
 {
     std::istringstream          s(data);
     std::vector<std::string>    Lines;
@@ -183,7 +183,7 @@ std::vector<std::string> HttpRequests::SplitRequest(std::string data)
     return (Lines);
 }
 
-std::string  HttpRequests::FillRequestLine()//change this and work with SearchLine()
+std::string  Requests::FillRequestLine()//change this and work with SearchLine()
 {
     //Request-Line = Method SP Request-URI SP HTTP-Version CRLF
     if (Lines.size() > 0)
@@ -191,7 +191,7 @@ std::string  HttpRequests::FillRequestLine()//change this and work with SearchLi
     return (RequestLine);
 }
 
-void FormOne(HttpRequests *Request)
+void FormOne(Requests *Request)
 {
     bool                                                Status;
     std::string                                         Line;
@@ -229,7 +229,7 @@ std::vector<std::string> SplitBody(std::string data)
     return (Lines);
 }
 
-void FormTwo(HttpRequests *Request)
+void FormTwo(Requests *Request)
 {
     std::vector<std::pair<std::string, std::string> >   Body;
     std::vector<std::string>                            data; 
@@ -262,7 +262,7 @@ void FormTwo(HttpRequests *Request)
     Request->SetBody(Body);
 }
 
-void    ConvertBodyToKeyValue(HttpRequests *Request)
+void    ConvertBodyToKeyValue(Requests *Request)
 {
     if (Request->GetContentType() == "application/x-www-form-urlencoded")
         FormOne(Request);
@@ -270,7 +270,7 @@ void    ConvertBodyToKeyValue(HttpRequests *Request)
         FormTwo(Request);
 }
 
-void FillBody(HttpRequests *Request, std::string data)
+void FillBody(Requests *Request, std::string data)
 {
     size_t begin;
     
@@ -284,12 +284,12 @@ void FillBody(HttpRequests *Request, std::string data)
         Request->AllBody += data[i];
     }
     ConvertBodyToKeyValue(Request);
-    Request->PrintVectorOfPairs(Request->GetBody());
+    // Request->PrintVectorOfPairs(Request->GetBody());
 }
 
-HttpRequests *    FillLines(std::vector<std::string>    SingleRequest)
+Requests *    FillLines(std::vector<std::string>    SingleRequest)
 {
-    HttpRequests *Request = new HttpRequests();
+    Requests *Request = new Requests();
     
     for (std::vector<std::string>::iterator SimpleIter = SingleRequest.begin(); \
             SimpleIter != SingleRequest.end(); SimpleIter++)//i will remove this later
@@ -305,10 +305,10 @@ HttpRequests *    FillLines(std::vector<std::string>    SingleRequest)
 
 void	HandleRequest(std::string _readStr, int sd, std::map<int, Client *>	*ClientsInformation, Client *_Client)
 {
-	HttpRequests				*Request;
+	Requests				*Request;
 	std::vector<std::string>	SingleRequest;
 
-	Request = new HttpRequests();
+	Request = new Requests();
 	SingleRequest.push_back(_readStr);
 	Request = FillLines(SingleRequest);
 	_Client->ClientRequest = Request;
@@ -316,7 +316,7 @@ void	HandleRequest(std::string _readStr, int sd, std::map<int, Client *>	*Client
 	// PrintMap(ClientsInformation);
 }
 
-void    HttpRequests::PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >           Body)
+void    Requests::PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >           Body)
 {
     std::vector<std::pair<std::string, std::string> >::iterator           iter;
     for (iter = Body.begin(); iter != Body.end(); iter++)
