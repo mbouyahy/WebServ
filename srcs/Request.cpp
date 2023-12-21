@@ -6,13 +6,11 @@
 /*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 14:45:11 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 22:26:27 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2023/12/21 15:03:47 by mbouyahy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
-
-// void    PrintVectorOfPairs(std::vector<std::pair<std::string, std::string> >           Body);
 
 HttpRequests::HttpRequests(){ }
 
@@ -99,9 +97,15 @@ void HttpRequests::SpecialGetContentType(std::string     Value)
     size_t begin = Value.find(";");
     for (size_t i = 0; i < begin && begin <= Value.size(); i++)
         ContentType += Value[i];
-    begin = Value.find("="); 
+    begin = Value.find("=");
+    boundary += "--";
     for (size_t i = begin + 1; i < Value.size() && begin <= Value.size(); i++)//skep (;Space)
+    {
+        if (Value[i] == '\n' || Value[i] == '\r')
+            break ;
         boundary += Value[i];
+    }
+    boundary += "\r";
 }
 
 void HttpRequests::SplitLine(std::string Line)
@@ -169,12 +173,11 @@ std::vector<std::string> HttpRequests::SplitRequest(std::string data)
     int                         i;
 
     i = 0;
-    while (std::getline(s, Line))//check for CRLF | CR | LF
+    while (std::getline(s, Line))//check for CRLF | CR | LF !
     {
         if (i > 0)
             SplitLine(Line);
         Lines.push_back(Line);
-        // std::cout << Line << std::endl;
         i++;
     }
     return (Lines);
@@ -213,15 +216,54 @@ void FormOne(HttpRequests *Request)
     Request->SetBody(Body);
 }
 
+std::vector<std::string> SplitBody(std::string data)
+{
+    std::istringstream          s(data);
+    std::vector<std::string>    Lines;
+    std::string                 Line;
+
+    while (std::getline(s, Line))//check for CRLF | CR | LF
+    {
+        Lines.push_back(Line);
+    }
+    return (Lines);
+}
+
 void FormTwo(HttpRequests *Request)
 {
-    (void)Request;
-    std::cout << "*****" << std::endl;
+    std::vector<std::pair<std::string, std::string> >   Body;
+    std::vector<std::string>                            data; 
+    std::string                                         value;
+    std::string                                         key;
+
+    data = SplitBody(Request->AllBody);
+    for (std::vector<std::string>::iterator iter = data.begin(); iter != data.end(); iter++)
+    {
+        if (*iter == Request->boundary)
+        {
+            iter++;
+            size_t begin = (*iter).find("=");
+            for (size_t i = begin + 2; i < (*iter).size() && begin <= (*iter).size(); i++)
+            {
+                if (i + 1 < (*iter).size() && ((*iter)[i + 1] == '\r' || (*iter)[i + 1] == '\n'))
+                    break ;
+                key += (*iter)[i];
+            }
+            if (iter + 2 != data.begin())
+            {
+                iter += 2;
+                value = *iter;
+            }
+            Body.push_back(std::make_pair(key, value));
+            key = "";
+            value = "";
+        }
+    }
+    Request->SetBody(Body);
 }
 
 void    ConvertBodyToKeyValue(HttpRequests *Request)
 {
-    // std::cout << Request->GetContentType() << std::endl;
     if (Request->GetContentType() == "application/x-www-form-urlencoded")
         FormOne(Request);
     else if (Request->GetContentType() == "multipart/form-data")
@@ -252,7 +294,7 @@ HttpRequests *    FillLines(std::vector<std::string>    SingleRequest)
     for (std::vector<std::string>::iterator SimpleIter = SingleRequest.begin(); \
             SimpleIter != SingleRequest.end(); SimpleIter++)//i will remove this later
     {
-        Request->Lines = Request->SplitRequest(*SimpleIter);//test
+        Request->Lines = Request->SplitRequest(*SimpleIter);
         Request->FillRequestLine();
         Request->FillRequestURI();
         if (Request->GetMethod() == "POST")
