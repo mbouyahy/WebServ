@@ -3,18 +3,50 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbouyahy <mbouyahy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: abelayad <abelayad@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 12:39:10 by mbouyahy          #+#    #+#             */
-/*   Updated: 2023/12/20 20:40:11 by mbouyahy         ###   ########.fr       */
+/*   Updated: 2024/01/07 22:06:15 by abelayad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(){}
+Client::Client(std::string buffer)
+	:	_request(new Request(buffer)), _isSend(false)
+{}
 
-Client::~Client(){}
+Client::~Client()
+{
+	delete	_request;
+}
+
+void	Client::createRequest(std::string buffer)
+{
+	_request = new Request(buffer);
+}
+
+void	Client::deleteRequest()
+{
+	delete _request;
+	_request = NULL;
+}
+
+std::string	Client::createResponse()
+{
+	Response* response = new Response(_request);
+	return (response->getContent());
+}
+
+Request*	Client::getRequest() const
+{
+	return (_request);
+}
+
+Response*	Client::getResponse() const
+{
+	return (_request->getResponse());
+}
 
 Client::Client(const Client &other){ (void)other; }
 
@@ -24,30 +56,34 @@ Client &Client::operator=(const Client &other)
     return (*this);
 }
 
-void PrintMap(std::__1::map<int, Client *> *_Map)
+void PrintMap(std::map<int, Client *> Map)
 {
-	std::__1::map<int, Client *>::iterator iter;
-	for (iter = _Map->begin(); iter != _Map->end(); iter++)
+	std::map<int, Client *>::iterator iter;
+	for (iter = Map.begin(); iter != Map.end(); iter++)
 	{
 		std::cout << "\n<-------------------Info Begin------------------>\n" << std::endl;
-        std::cout << "Map Size : " << _Map->size() << std::endl;
+        std::cout << "Map Size : " << Map.size() << std::endl;
 		std::cout << "Sd : " << iter->first << std::endl;
-		std::cout << "RequestLine : " << iter->second->ClientRequest->GetRequestLine() << std::endl;
-		std::cout << "RequestURI : " << iter->second->ClientRequest->GetRequestURI() << std::endl;
-		std::cout << "Method : " << iter->second->ClientRequest->GetMethod() << std::endl;
-		std::cout << "HTTPVersion : " << iter->second->ClientRequest->GetHTTPVersion() << std::endl;
-		std::cout << "ErrorCode : " << iter->second->ClientRequest->GetErrorCode() << std::endl;
-		std::cout << "Connection : " << iter->second->ClientRequest->GetConnection() << std::endl;
-        if (iter->second->ClientRequest->GetMethod() == "POST")
+		std::cout << "RequestLine : " << iter->second->_request->getRequestLine() << std::endl;
+		std::cout << "RequestURI : " << iter->second->_request->getUri() << std::endl;
+		std::cout << "Query : " << iter->second->_request->getQuery() << std::endl;
+		std::cout << "Method : " << iter->second->_request->getMethod() << std::endl;
+		std::cout << "HTTPVersion : " << iter->second->_request->getHTTPVersion() << std::endl;
+		std::cout << "StatusCode : " << iter->second->_request->getStatusCode() << std::endl;
+		std::cout << "Connection : " << iter->second->_request->getConnection() << std::endl;
+		std::cout << "TransferEncoding : " << iter->second->_request->getTransferEncoding() << std::endl;
+		std::cout << "Connection : " << iter->second->_request->getConnection() << std::endl;
+        if (iter->second->_request->getMethod() == "POST")
         {
-            std::cout << "ContentType : " << iter->second->ClientRequest->GetContentType() << std::endl;
-            std::cout << "ContentLength : " << iter->second->ClientRequest->GetContentLength() << std::endl;
+            std::cout << "ContentType : " << iter->second->_request->getContentType() << std::endl;
+            std::cout << "ContentLength : " << iter->second->_request->getContentLength() << std::endl;
         }
+		std::cout << "IsFinished : " << iter->second->_request->isFinished << std::endl;
 		std::cout << "\n<-------------------Info End------------------>" << std::endl;
 
 		std::cout << "\n<-------------------Header Begin------------------>\n" << std::endl;
 		std::map<std::string, std::string>                          _Header;
-		_Header = iter->second->ClientRequest->GetHeader();
+		_Header = iter->second->_request->getHeader();
 		for (std::map<std::string, std::string>::iterator Hiter = _Header.begin(); Hiter != _Header.end(); Hiter++)
 		{
 			std::cout << "Key :   " << Hiter->first << "                                          Value : " << Hiter->second << std::endl;
@@ -55,8 +91,10 @@ void PrintMap(std::__1::map<int, Client *> *_Map)
 		std::cout << "\n<-------------------Header End------------------>" << std::endl;
 
 		std::cout << "\n<-------------------Body Begin------------------>\n" << std::endl;
-        if (iter->second->ClientRequest->GetMethod() == "POST")
-		    iter->second->ClientRequest->PrintVectorOfPairs(iter->second->ClientRequest->GetBody());
+        if (iter->second->_request->getMethod() == "POST")
+		    iter->second->_request->printVectorOfPairs(iter->second->_request->getBody());
+		
+		iter->second->_request->printVectorOfPairs(iter->second->_request->files);
 		std::cout << "\n<-------------------Body End------------------>\n" << std::endl;
 	}
 }

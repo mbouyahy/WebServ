@@ -1,30 +1,48 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Config.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abelayad <abelayad@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/07 22:31:03 by abelayad          #+#    #+#             */
+/*   Updated: 2024/01/08 22:32:43 by abelayad         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include <ft_common.h>
 #include "Server.hpp"
 #include "Printers.hpp"
-
 #include "Client.hpp"//added by mbouyahy
+
+extern std::map<std::string, std::string>	g_mimeTypes;
 
 class	Printers;
 class	ServersSocket;
+class	Client;
 
 class	Config
 {
 public :
-	
 	Config(const std::string &);
 	~Config();
 	void						run();
 	static struct sockaddr_in	strToSockaddrin(const std::string& port);
+	// GETTERS
+	// try to get a const ref instead of a copy
+	std::map<int, Client*>			getSdToClient() const;
+	ServersSocket*					getServersSocket(int) const;
+	// SETTERS
+	void						insertToSdToClient(std::pair<int, Client*>);
+
 private:
 	std::ifstream							_configFile;
 	std::map<std::string, ServersSocket*>	_portToServersSocket;
 	std::map<int, ServersSocket*>			_sdToServersSocket;//sd: socket descriptor
-	// std::map<int, Client*>					_sdToClients;
+	std::map<int, Client*>					_sdToClient;
 	std::vector<struct pollfd>				_pollFds;
-
-	std::string								_readStr;
 
 	// METHODS
 	void			_openConfig(const std::string &);
@@ -38,7 +56,7 @@ private:
 	void			_readRequest(int sd);
 	void			_sendResponse(int sd);
 	bool			_portExists(const std::string& s);
-	std::string		_getListen(std::istringstream& iss);
+	std::string		_extractListen(std::istringstream& iss);
 
 	// PARSERS >
 	void			_parseServer();
@@ -56,6 +74,3 @@ private:
 // 	Request;
 // 	Response;
 // };
-
-
-

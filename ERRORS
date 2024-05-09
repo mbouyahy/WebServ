@@ -30,3 +30,4 @@ previously allocated by thread T0 here:
     #4 0x10894fd6c in Config::Config(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) Config.cpp:14
     #5 0x1089311cb in main main.cpp:22
     #6 0x7fff7179fcc8 in start (libdyld.dylib:x86_64+0x1acc8)
+

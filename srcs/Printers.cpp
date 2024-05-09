@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Printers.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abelayad <abelayad@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/07 22:31:47 by abelayad          #+#    #+#             */
+/*   Updated: 2024/01/07 22:31:47 by abelayad         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Printers.hpp"
 
 void	Printers::print_with_color(const std::string& color, const std::string& s)
@@ -87,8 +99,10 @@ void	Printers::print_locations(const Server *srv)
 	for (size_t i = 0; i < locations.size(); i++)
 	{
 		std::cout << BLUE << "-------------------" << i << "-------------------" << RESET_COLOR << std::endl;
+		std::cout << "Server: " << locations[i]->getServer() << std::endl;
 		std::cout << "Path: " << locations[i]->getPath() << std::endl;
 		std::cout << "RootPath: " << locations[i]->getRootPath() << std::endl;
+		std::cout << "UploadDir: " << locations[i]->getUploadDir() << std::endl;
 		print_indexes(locations[i]->getIndexes());
 		std::cout << "AutoIndex: " << locations[i]->getAutoIndex() << std::endl;
 		print_allow_methods(locations[i]->getAllowMethods());

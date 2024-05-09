@@ -1,19 +1,58 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Config.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abelayad <abelayad@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/07 22:31:37 by abelayad          #+#    #+#             */
+/*   Updated: 2024/01/08 23:09:41 by abelayad         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Config.hpp"
 
+std::map<std::string, std::string>	g_mimeTypes;
+
+void	initMimeTypes()
+{
+    std::ifstream file(MIMETYPES_FILE_PATH);
+    if (!file.is_open())
+		throw(std::runtime_error("error opening the MIMETYPES file"));
+
+    std::string line;
+    while (std::getline(file, line))
+	{
+        std::istringstream linestream(line);
+        std::string extension;
+        std::string mimeType;
+		std::getline(linestream, extension, ',');
+		std::getline(linestream, mimeType);
+		g_mimeTypes[extension] = mimeType;
+    }
+    file.close();
+	std::cout << RED << "initialized mime types" << RESET_COLOR << std::endl;
+}
+
+// there is a problem with the freeing 
 Config::~Config()
 {
+	std::set<ServersSocket*>	ptrs;
 	for (std::map<int, ServersSocket*>::iterator it = _sdToServersSocket.begin();
 		it != _sdToServersSocket.end(); it++)
 	{
-		delete it->second;
 		close(it->first);
+		ptrs.insert(it->second);
 	}
+	for (std::set<ServersSocket*>::iterator it = ptrs.begin(); it != ptrs.end(); it++)
+		delete *it;
 }
 
 Config::Config(const std::string &input)
 {
 	std::string	line;
 
+	initMimeTypes();
 	_openConfig(input);
 	while (std::getline(_configFile, line))
 	{
@@ -82,7 +121,7 @@ bool isValidIPv4(const std::string& ip) {
     return true;
 }
 
-std::string	Config::_getListen(std::istringstream& iss)
+std::string	Config::_extractListen(std::istringstream& iss)
 {
 	std::string			ip;
 	int					portNum;
@@ -114,7 +153,7 @@ bool	Config::_portExists(const std::string& s)
 
 void Config::_parseListen(std::istringstream& iss, Server* srv)
 {
-	const std::string&	port(_getListen(iss));
+	const std::string&	port(_extractListen(iss));
 
 	if (_portExists(port))
 		_portToServersSocket[port]->addServer(srv);
@@ -132,6 +171,7 @@ void Config::_parseServerNames(std::istringstream &iss, Server* srv)
 		throw(std::runtime_error("error in server_names"));
 }
 
+// I ll need to check error_pages presence later
 void	_parseErrorPages(std::istringstream &iss, Server* srv)
 {
 	std::string	errorPage;
@@ -182,6 +222,8 @@ void Config::_parseLocation(std::istringstream& iss, Server* srv)
 			throw std::runtime_error("Location block inside location block");
 		if (line == "root")
 			location->setRootPath(iss);
+		else if (line == "upload_dir")
+			location->setUploadDir(iss);
 		else if (line == "index")
 			location->addIndex(iss);
 		else if (line == "autoindex")
@@ -246,6 +288,7 @@ void Config::_unplugSocket(ServersSocket *sS)
 		{
 			_portToServersSocket.erase(it->first);
 			delete sS;
+			sS = NULL;
 			break ;
 		}
 	}
@@ -283,7 +326,11 @@ void	Config::_addPollfd(int sd, short events)
 
 void	Config::_rmPollfd(int sd)
 {
+	/*test*/
+	// std::cout << YELLOW << "I GET INTO THE REMOVE" << RESET_COLOR << std::endl;
+	// delete _sdToServersSocket[sd];
 	_sdToServersSocket.erase(sd);
+	/*test*/
 	// remove from pollfds
 	for (std::vector<struct pollfd>::iterator it = _pollFds.begin();
 		it != _pollFds.end(); it++)
@@ -325,4 +372,25 @@ void	Config::_initSockets()
 		_sdToServersSocket.insert(std::make_pair(sockfd, it->second));
 		_addPollfd(sockfd, POLLIN);
 	}
+}
+
+std::map<int, Client*>	Config::getSdToClient() const
+{
+	return (this->_sdToClient);
+}
+
+void	Config::insertToSdToClient(std::pair<int, Client*> pair)
+{
+	// std::cout << RED << "INSERTION!!!" << RESET_COLOR << std::endl;
+	_sdToClient.insert(pair);
+}
+
+ServersSocket*	Config::getServersSocket(int sd) const
+{
+	std::map<int, ServersSocket*>
+		::const_iterator	it = _sdToServersSocket.find(sd);
+
+	if (it != _sdToServersSocket.end())
+		return (it->second);
+    return (NULL);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Location.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abelayad <abelayad@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/07 22:31:41 by abelayad          #+#    #+#             */
+/*   Updated: 2024/01/07 22:31:41 by abelayad         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Location.hpp"
 
 // Constructor
@@ -24,13 +36,24 @@ Location &Location::operator=(const Location &copy)
 		_autoIndex = copy._autoIndex;
 		_allowMethods = copy._allowMethods;
 		_cgi = copy._cgi;
+		_uploadDir = copy._uploadDir;
 	}
 	return (*this);
+}
+
+Server*	Location::getServer() const
+{
+	return (this->_server);
 }
 
 std::string		Location::getRootPath() const
 {
 	return (this->_rootPath);
+}
+
+std::string		Location::getUploadDir() const
+{
+	return (this->_uploadDir);
 }
 
 const std::vector<std::string>&	Location::getIndexes() const
@@ -70,6 +93,8 @@ void	Location::setPath(std::istringstream &iss)
 
 	if (!(iss >> path))
 		throw std::runtime_error("Invalid ressource type");
+	if (path[0] != '/' || path[path.size() - 1] != '/')
+		throw std::runtime_error("A Location path must start and end with a '/'");
 	_path = path;
 }
 
@@ -91,6 +116,21 @@ void	Location::setRootPath(std::istringstream &iss)
 	if (!(info.st_mode & S_IFDIR))
 		throw(std::runtime_error("the rootPath is not a directory!"));
 	_rootPath = rootPath;
+}
+
+void	Location::setUploadDir(std::istringstream &iss)
+{
+	std::string	uploadDir;
+	struct stat	info;
+	
+	iss >> uploadDir;
+	if (iss.fail() || !iss.eof())
+		throw(std::runtime_error("error in upload_dir"));
+	if (stat(uploadDir.c_str(), &info) != 0)
+        throw(std::runtime_error("Error in `upload_dir`, make sure that the upload_dir does exist!"));
+	if (!(info.st_mode & S_IFDIR))
+		throw(std::runtime_error("the upload_dir is not a directory!"));
+	_uploadDir = uploadDir;
 }
 
 void	Location::addIndex(std::istringstream &iss)
@@ -121,6 +161,11 @@ void	Location::setAutoIndex(std::istringstream &iss)
 const std::string&	Location::getPath() const
 {
 	return (this->_path);
+}
+
+  std::map<std::string, std::string> 	Location::getCgi()  
+{
+	return (this->_cgi);
 }
 
 void	Location::setAllowMethods(std::istringstream &iss)
