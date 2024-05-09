@@ -1,0 +1,8 @@
+*.o
+webserv
+*.vscode
+*.DS_Store
+*.mp4
+uploads/
+*.vscode/
+cgi-bin/
