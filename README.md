@@ -98,3 +98,10 @@ Common uses of CGI include:
 - `access`: Checks file or directory access permissions.
 - `stat`: Retrieves file status information.
 - `open`, `opendir`, `readdir`, `closedir`: File and directory manipulation functions.
+
+## Acknowledgements
+
+Special thanks to the following contributors for their valuable contributions to this project:
+
+- [@m4nnb3ll](https://github.com/m4nnb3ll)
+- [@sekak](https://github.com/sekak)
