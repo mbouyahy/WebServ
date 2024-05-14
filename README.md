@@ -35,6 +35,8 @@ Here are some key features and improvements introduced in HTTP/1.1:
 5. **Cache Control**: HTTP/1.1 introduced more sophisticated caching mechanisms, including cache control headers such as Cache-Control and ETag, allowing servers and clients to specify caching behavior more precisely.
 6. **Content Negotiation**: HTTP/1.1 expanded content negotiation capabilities, allowing servers to serve different versions of a resource based on factors such as language, content encoding, and media type preferences specified by the client.
 
+<img src="web_root/Http-diagram.png" width="300">
+
 ### <span style="color:blue">I/O Multiplexing :</span>
 
 I/O multiplexing is a technique used in computer programming and operating systems to manage multiple input/output (I/O) operations concurrently without the need for multiple threads or processes. It allows a single process or thread to monitor multiple I/O streams (such as sockets, files, or pipes) and respond to events on these streams efficiently.
